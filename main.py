@@ -156,7 +156,6 @@ def get_user_recommendations():
 
 @app.get("/getRecipeDetails")
 def get_recipe_details(recipe_id: int):
-    print(recipe_id)
     for recipe in dummy_recipes:
         if recipe.ID == recipe_id:
             return recipe
@@ -198,12 +197,11 @@ def set_user_preferences(preferences: UserPreferences):
     return {"message": "User preferences updated", "data": preferences}
 
 @app.get("/query")
-def query_recipes(query: str, sortBy_field: str, sortBy_direction: str):
-    """
-    query: JSON string içeren sorgu. Örneğin: {"search": "pancake", "vegan": true}
-    sortBy_field: sıralama yapılacak alan ("TotalTime", "ID" vb.)
-    sortBy_direction: "asc" veya "desc"
-    """
+def query_recipes(
+    query: str,
+    sortBy_field: str = Query(..., alias="sortBy.field"),
+    sortBy_direction: str = Query(..., alias="sortBy.direction")
+):
     try:
         query_dict = json.loads(query)
     except Exception:
@@ -211,7 +209,7 @@ def query_recipes(query: str, sortBy_field: str, sortBy_direction: str):
     
     filtered = dummy_recipes
 
-    # Arama kelimesine göre filtrele (isim içinde geçen)
+    # Arama kelimesine göre filtrele
     search_term = query_dict.get("search", "").lower()
     if search_term:
         filtered = [r for r in filtered if search_term in r.Name.lower()]
@@ -221,7 +219,7 @@ def query_recipes(query: str, sortBy_field: str, sortBy_direction: str):
         category = query_dict["category"].lower()
         filtered = [r for r in filtered if r.Category.lower() == category]
 
-    # Diyet filtreleri (etiketlere bakıyoruz)
+    # Diyet filtreleri
     for filt in ["vegan", "vegetarian", "gluten_free", "dairy_free", "pescetarian"]:
         if query_dict.get(filt, False):
             filtered = [r for r in filtered if filt in r.Label]
@@ -231,7 +229,7 @@ def query_recipes(query: str, sortBy_field: str, sortBy_direction: str):
     try:
         filtered.sort(key=lambda r: getattr(r, sortBy_field), reverse=reverse)
     except Exception:
-        pass  # Eğer sıralama alanı bulunamazsa sıralamayı atla
+        pass
 
     return filtered
 
