@@ -71,7 +71,7 @@ dummy_recipes = [
     Recipe(
         ID=2,
         Name="Chicken Salad",
-        Instructions="Mix grilled chicken with fresh vegetables.",
+        Instructions="Mix grilled chicken with fresh vegetables. Mix grilled chicken with fresh vegetables. Mix grilled chicken with fresh vegetables. Mix grilled chicken with fresh vegetables. Mix grilled chicken with fresh vegetables.",
         Ingredients=[
             Ingredient(name="Chicken Breast", quantity=200, unit="g"),
             Ingredient(name="Lettuce", quantity=100, unit="g")
@@ -156,6 +156,7 @@ def get_user_recommendations():
 
 @app.get("/getRecipeDetails")
 def get_recipe_details(recipe_id: int):
+    print(recipe_id)
     for recipe in dummy_recipes:
         if recipe.ID == recipe_id:
             return recipe
